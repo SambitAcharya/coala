@@ -56,3 +56,10 @@ class coalaJSONTest(unittest.TestCase):
         retval, output = execute_coala(coala_json.main, 'coala-json', '-v')
         self.assertEquals(retval, 0)
         self.assertEquals(output.strip(), VERSION)
+
+    def test_text_logs(self):
+        retval, output = execute_coala(
+            coala_json.main, 'coala-json', '--text-logs', '-c', 'nonex')
+        self.assertRegex(
+            output,
+            ".*\\[ERROR\\].*The requested coafile '.*' does not exist.\n")
