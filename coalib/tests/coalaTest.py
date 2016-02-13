@@ -3,7 +3,8 @@ import os
 import unittest
 import re
 from tempfile import TemporaryDirectory, NamedTemporaryFile
-from coalib.misc.ContextManagers import make_temp
+
+from coalib.misc.ContextManagers import make_temp, prepare_file
 from coalib import coala_ci
 from coalib.output.Tagging import get_tag_path
 from coalib.tests.TestUtilities import execute_coala
@@ -49,6 +50,17 @@ class coalaTest(unittest.TestCase):
                             0,
                             "coala-ci must return nonzero when running over "
                             "its own code. (Target section: todos)")
+
+    def test_fix_patchable_issues(self):
+        with prepare_file(["pass"], None) as (lines, filename):
+            retval, output = execute_coala(
+                coala_ci.main, "coala-ci",
+                "--files", filename, "--bears", "PEP8Bear",
+                "-S", "autoapply=true", "max_line_length=2")
+            self.assertEqual(retval,
+                             5,
+                             "coala-ci must return exitcode 5 when it "
+                             "autofixes the code.")
 
     def test_tagging(self):
         execute_coala(coala_ci.main, "coala-ci", 'docs',
